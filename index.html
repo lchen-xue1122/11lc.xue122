@@ -17,11 +17,14 @@ body { font-family: -apple-system, "PingFang SC", sans-serif; font-size: 16px; c
 .page { flex: 1; display: none; flex-direction: column; overflow: hidden; position: relative; }
 .page.active { display: flex; }
 
-.chat-header { height: 44px; background: var(--bg-nav); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 500; flex-shrink: 0; }
+/* 顶部栏 */
+.chat-header { height: 44px; background: var(--bg-nav); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 500; flex-shrink: 0; }
+.header-avatar { width: 28px; height: 28px; border-radius: 4px; background: #ccc; background-size: cover; background-position: center; display: none; }
+
 .chat-list { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
 .msg { display: flex; gap: 8px; }
 .msg.mine { flex-direction: row-reverse; }
-.msg .avatar { width: 40px; height: 40px; border-radius: 4px; background: #ccc; flex-shrink: 0; }
+.msg .avatar { width: 40px; height: 40px; border-radius: 4px; background: #ccc; background-size: cover; background-position: center; flex-shrink: 0; }
 .msg .bubble-wrap { max-width: 75%; display: flex; flex-direction: column; }
 .msg.mine .bubble-wrap { align-items: flex-end; }
 
@@ -63,6 +66,10 @@ body { font-family: -apple-system, "PingFang SC", sans-serif; font-size: 16px; c
 .setting-row input[type=text] { flex: 1; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-input); color: var(--text); font-size: 14px; text-align: right; outline: none; }
 .section-title { font-size: 12px; color: var(--text-secondary); margin: 16px 4px 8px; }
 
+/* 按钮通用样式 */
+.btn-upload { padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-input); color: var(--text); font-size: 13px; cursor: pointer; text-align: center; }
+.btn-danger { padding: 6px 12px; border-radius: 4px; border: 1px solid #e74c3c; background: transparent; color: #e74c3c; font-size: 13px; cursor: pointer; }
+
 .modal-mask { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.5); z-index: 999; justify-content: center; align-items: center; padding: 20px; }
 .modal-content { background: var(--bubble-other); padding: 16px; border-radius: 8px; width: 100%; max-width: 400px; }
 .modal-content h3 { margin-bottom: 12px; font-size: 16px; color: var(--text); }
@@ -76,7 +83,10 @@ body { font-family: -apple-system, "PingFang SC", sans-serif; font-size: 16px; c
 <body>
 <div id="app">
   <div class="page active" id="page-chat">
-    <div class="chat-header" id="chat-header">对方</div>
+    <div class="chat-header">
+      <div class="header-avatar" id="header-avatar"></div>
+      <span id="header-name">对方</span>
+    </div>
     <div class="chat-list" id="chat-list"></div>
     <div class="chat-input">
       <input id="msg-input" placeholder="输入消息…" onkeydown="if(event.key==='Enter')sendText()">
@@ -97,9 +107,11 @@ body { font-family: -apple-system, "PingFang SC", sans-serif; font-size: 16px; c
 
   <div class="page" id="page-settings">
     <div class="page-inner">
-      <div class="section-title">外观与体验</div>
+      <div class="section-title">外观与头像</div>
       <div class="setting-row"><span>夜间模式</span><input type="checkbox" id="set-dark" onchange="updateSetting('dark',this.checked)"></div>
       <div class="setting-row"><span>系统名称</span><input type="text" id="set-name" onchange="updateSetting('sysName',this.value)"></div>
+      <div class="setting-row"><span>对方头像</span><label class="btn-upload">选择图片<input type="file" accept="image/*" style="display:none" onchange="uploadAvatar(event, 'otherAvatar')"></label></div>
+      <div class="setting-row"><span>我的头像</span><label class="btn-upload">选择图片<input type="file" accept="image/*" style="display:none" onchange="uploadAvatar(event, 'myAvatar')"></label></div>
       <div class="setting-row"><span>时间戳常显</span><input type="checkbox" id="set-time" onchange="updateSetting('alwaysShowTime',this.checked)"></div>
       
       <div class="section-title">回复逻辑（发消息触发）</div>
@@ -109,13 +121,13 @@ body { font-family: -apple-system, "PingFang SC", sans-serif; font-size: 16px; c
       <div class="setting-row"><span>连句功能（符号分隔）</span><input type="checkbox" id="set-multi" onchange="updateSetting('multiEnabled',this.checked)"></div>
       <div class="setting-row"><span>引用回复概率（%）</span><input type="number" id="set-quote" min="0" max="100" onchange="updateSetting('quoteChance',+this.value)"></div>
       
-      <div class="section-title">主动消息（不用发消息也会收到）</div>
+      <div class="section-title">主动消息</div>
       <div class="setting-row"><span>开启主动消息</span><input type="checkbox" id="set-proactive" onchange="updateSetting('proactiveEnabled',this.checked)"></div>
       <div class="setting-row"><span>间隔（分钟）</span><span><input type="number" id="set-pro-min" min="1" onchange="updateSetting('proactiveMin',+this.value)"> ~ <input type="number" id="set-pro-max" min="1" onchange="updateSetting('proactiveMax',+this.value)"></span></div>
 
       <div class="section-title">数据</div>
-      <div class="setting-row"><span>导出数据</span><button onclick="exportData()" style="padding:6px 12px;border-radius:4px;border:1px solid var(--border);background:var(--bg-input);color:var(--text);font-size:13px">导出</button></div>
-      <div class="setting-row"><span>重置所有数据</span><button onclick="resetData()" style="padding:6px 12px;border-radius:4px;border:1px solid #e74c3c;background:transparent;color:#e74c3c;font-size:13px">重置</button></div>
+      <div class="setting-row"><span>导出数据</span><button onclick="exportData()" class="btn-upload">导出</button></div>
+      <div class="setting-row"><span>重置所有数据</span><button onclick="resetData()" class="btn-danger">重置</button></div>
     </div>
   </div>
 
@@ -146,6 +158,7 @@ const $ = id => document.getElementById(id);
 
 const defaultSettings = {
   id:'main', dark:false, sysName:'对方',
+  otherAvatar: '', myAvatar: '',
   minCount:1, maxCount:2, minDelay:3, maxDelay:10,
   noReplyChance:10, 
   multiEnabled: false, separators:['，','。','…','~'],
@@ -164,9 +177,13 @@ function loadDB() {
   } catch(e) {}
 }
 function saveDB() {
-  localStorage.setItem('settings', JSON.stringify(db.settings));
-  localStorage.setItem('cards', JSON.stringify(db.cards));
-  localStorage.setItem('messages', JSON.stringify(db.messages));
+  try {
+    localStorage.setItem('settings', JSON.stringify(db.settings));
+    localStorage.setItem('cards', JSON.stringify(db.cards));
+    localStorage.setItem('messages', JSON.stringify(db.messages));
+  } catch(e) {
+    alert('存储空间不足，图片可能太大，请尝试压缩图片后再传。');
+  }
 }
 
 function weightedPick(items) {
@@ -213,7 +230,15 @@ function loadSettings() {
 
 function applyTheme() {
   document.body.classList.toggle('dark', !!settings.dark);
-  $('chat-header').textContent = settings.sysName;
+  $('header-name').textContent = settings.sysName;
+  
+  const hAv = $('header-avatar');
+  if (settings.otherAvatar) {
+    hAv.style.display = 'block';
+    hAv.style.backgroundImage = `url(${settings.otherAvatar})`;
+  } else {
+    hAv.style.display = 'none';
+  }
 }
 
 function updateSetting(key,value) {
@@ -224,6 +249,44 @@ function updateSetting(key,value) {
   applyTheme();
   if (key === 'alwaysShowTime') renderMessages();
   if(key.includes('proactive')) scheduleProactive();
+}
+
+// 处理头像上传并压缩
+function uploadAvatar(e, type) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+      const maxSize = 200; // 限制最大宽高为 200px，节省空间
+      
+      if (width > height && width > maxSize) {
+        height = Math.round((height * maxSize) / width);
+        width = maxSize;
+      } else if (height > maxSize) {
+        width = Math.round((width * maxSize) / height);
+        height = maxSize;
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      // 压缩为 jpeg，质量为 0.8
+      const base64 = canvas.toDataURL('image/jpeg', 0.8);
+      updateSetting(type, base64);
+      renderMessages(); // 刷新聊天界面的头像
+      e.target.value = ''; // 允许重复选同一张图
+    };
+    img.src = evt.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 function switchTab(name) {
@@ -247,9 +310,14 @@ function renderMessageEl(m) {
   el.className = 'msg' + (isMine ? ' mine' : '') + (settings.alwaysShowTime ? ' show-time' : '');
   
   const av = document.createElement('div'); av.className='avatar';
+  if (isMine && settings.myAvatar) {
+    av.style.backgroundImage = `url(${settings.myAvatar})`;
+  } else if (!isMine && settings.otherAvatar) {
+    av.style.backgroundImage = `url(${settings.otherAvatar})`;
+  }
+  
   const wrap = document.createElement('div'); wrap.className='bubble-wrap';
   
-  // 引用框
   if (m.quote) {
     const q = document.createElement('div');
     q.className = 'quote-box';
@@ -262,7 +330,6 @@ function renderMessageEl(m) {
   t.textContent = new Date(m.ts).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
   wrap.appendChild(b); wrap.appendChild(t);
   
-  // 已读状态
   if (isMine) {
     const s = document.createElement('div'); s.className='msg-status'; s.textContent='已读';
     wrap.appendChild(s);
@@ -270,17 +337,13 @@ function renderMessageEl(m) {
   
   el.appendChild(av); el.appendChild(wrap);
   
-  // 点击气泡显示时间（如果没开常显）
-  b.addEventListener('click', (e) => {
-    if (!settings.alwaysShowTime) {
-      el.classList.toggle('show-time');
-    }
+  b.addEventListener('click', () => {
+    if (!settings.alwaysShowTime) el.classList.toggle('show-time');
   });
   
   return el;
 }
 
-// ---------- 发送与自动回复 ----------
 async function sendText() {
   const input = $('msg-input'); const text = input.value.trim();
   if (!text) return;
@@ -300,7 +363,6 @@ async function autoReply(userText) {
   
   const n = randInt(settings.minCount, settings.maxCount);
   const picked = pickN(cards, n);
-  
   const isQuote = Math.random()*100 < settings.quoteChance;
   
   for (const card of picked) {
@@ -319,12 +381,10 @@ async function autoReply(userText) {
     }
     
     db.messages.push(msgObj);
-    saveDB();
-    renderMessages();
+    saveDB(); renderMessages();
   }
 }
 
-// ---------- 主动消息 ----------
 let proactiveTimer = null;
 function scheduleProactive() {
   if (proactiveTimer) clearTimeout(proactiveTimer);
@@ -349,13 +409,11 @@ async function triggerProactiveMessage() {
   }
 }
 
-// ---------- 字卡管理 ----------
 function renderCards() {
   const cards = db.cards;
   const c = $('cards-list'); c.innerHTML='';
   if (!cards.length) { c.innerHTML='<div style="text-align:center;color:var(--text-secondary);padding:40px 0;font-size:14px">还没有字卡，去下面添加</div>'; return; }
   
-  // 按分组归类
   const groups = {};
   cards.forEach(card => {
     const g = card.group || '未分组';
@@ -391,7 +449,6 @@ function editWeight(id) {
   saveDB(); renderCards();
 }
 
-// 批量添加解析
 function openBatchModal() { $('batch-modal').style.display = 'flex'; $('batch-input').focus(); }
 function closeBatchModal() { $('batch-modal').style.display = 'none'; }
 function submitBatch() {
@@ -404,13 +461,11 @@ function submitBatch() {
     line = line.trim();
     if (!line) continue;
     
-    // 解析分组 # 分组名
     if (line.startsWith('#')) {
       currentGroup = line.slice(1).trim() || '未分组';
       continue;
     }
     
-    // 解析权重 |w3
     let weight = 1;
     const wMatch = line.match(/\|w(\d+)$/);
     if (wMatch) {
@@ -424,13 +479,10 @@ function submitBatch() {
     }
   }
   
-  saveDB();
-  closeBatchModal();
-  renderCards();
+  saveDB(); closeBatchModal(); renderCards();
   alert(`成功添加 ${count} 条字卡`);
 }
 
-// ---------- 数据管理 ----------
 function exportData() {
   const data = { settings: db.settings, cards: db.cards, messages: db.messages, exportedAt:Date.now() };
   const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
@@ -446,7 +498,6 @@ function resetData() {
   alert('已重置，即将刷新'); location.reload();
 }
 
-// 初始化
 loadDB();
 loadSettings();
 renderMessages();
