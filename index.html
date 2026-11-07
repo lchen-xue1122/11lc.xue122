@@ -9,47 +9,61 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg-chat:#EDEDED;--bg-nav:#F7F7F7;--bg-input:#F7F7F7;--bubble-other:#FFF;--bubble-me:#95EC69;--text:#111;--text-secondary:#888;--accent:#07C160;--border:rgba(0,0,0,.08)}
 body.dark{--bg-chat:#111;--bg-nav:#1C1C1C;--bg-input:#1C1C1C;--bubble-other:#2C2C2C;--bubble-me:#3EB575;--text:#E5E5E5;--text-secondary:#888;--border:rgba(255,255,255,.08)}
-html,body{height:100%;overflow:hidden}
-body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:16px;color:var(--text);background:var(--bg-chat)}
-#app{height:100vh;height:100dvh;display:flex;flex-direction:column}
-.page{flex:1;overflow-y:auto;display:none;flex-direction:column}
-.page.active{display:flex}
-.tabbar{display:flex;background:var(--bg-nav);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom);flex-shrink:0}
-.tabbar button{flex:1;padding:8px 0;background:none;border:none;font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
-.tabbar button.active{color:var(--accent)}
-.tabbar button .icon{font-size:20px}
-.chat-header{height:44px;background:var(--bg-nav);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:500;flex-shrink:0}
-.chat-list{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px}
-.msg{display:flex;gap:8px}
-.msg.mine{flex-direction:row-reverse}
-.msg .avatar{width:40px;height:40px;border-radius:4px;background:#ccc;flex-shrink:0}
-.msg .bubble-wrap{max-width:70%}
-.msg .bubble{padding:8px 12px;border-radius:8px;font-size:15px;line-height:1.4;white-space:pre-wrap;word-break:break-word;background:var(--bubble-other)}
-.msg.mine .bubble{background:var(--bubble-me)}
-.msg .time{font-size:11px;color:var(--text-secondary);margin-top:4px;display:none}
-.msg.show-time .time{display:block}
-.msg.mine .time{text-align:right}
-.msg.system{justify-content:center;font-size:12px;color:var(--text-secondary)}
-.chat-input{display:flex;gap:8px;padding:8px;background:var(--bg-input);border-top:1px solid var(--border);padding-bottom:max(8px,env(safe-area-inset-bottom));flex-shrink:0}
-.chat-input input{flex:1;padding:8px 12px;border-radius:4px;border:none;background:var(--bubble-other);color:var(--text);font-size:15px;outline:none}
-.chat-input button{padding:8px 14px;border-radius:4px;border:none;font-size:14px;cursor:pointer}
-.btn-send{background:var(--bubble-other);color:var(--text)}
-.btn-speak{background:var(--accent);color:#fff;font-weight:500}
-.typing{text-align:center;font-size:12px;color:var(--text-secondary);padding:4px}
-.page-inner{padding:12px}
-.card-group{background:var(--bubble-other);border-radius:8px;margin-bottom:12px;overflow:hidden}
-.card-group-header{padding:10px 12px;background:var(--bg-nav);display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500}
-.card-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-top:1px solid var(--border);font-size:14px;gap:8px}
-.card-item .content{flex:1}
-.card-item .weight{font-size:12px;color:var(--text-secondary)}
-.card-item button{background:none;border:none;color:#e74c3c;font-size:13px;cursor:pointer;padding:4px}
-.add-row{display:flex;gap:8px;margin-top:12px}
-.add-row input{flex:1;padding:8px 12px;border-radius:4px;border:1px solid var(--border);background:var(--bubble-other);color:var(--text);font-size:14px;outline:none}
-.add-row button{padding:8px 14px;border-radius:4px;border:none;background:var(--accent);color:#fff;font-size:14px;cursor:pointer}
-.setting-row{background:var(--bubble-other);padding:12px;border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-size:14px;gap:12px}
-.setting-row input[type=number]{width:70px;padding:4px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg-input);color:var(--text);font-size:14px;text-align:center}
-.setting-row input[type=text]{flex:1;padding:4px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg-input);color:var(--text);font-size:14px;text-align:right;outline:none}
-.section-title{font-size:12px;color:var(--text-secondary);margin:16px 4px 8px}
+
+html, body { height: 100%; overflow: hidden; }
+body { font-family: -apple-system, "PingFang SC", sans-serif; font-size: 16px; color: var(--text); background: var(--bg-chat); }
+
+#app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+.page { flex: 1; display: none; flex-direction: column; overflow: hidden; position: relative; }
+.page.active { display: flex; }
+
+.chat-header { height: 44px; background: var(--bg-nav); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 500; flex-shrink: 0; }
+.chat-list { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
+.msg { display: flex; gap: 8px; }
+.msg.mine { flex-direction: row-reverse; }
+.msg .avatar { width: 40px; height: 40px; border-radius: 4px; background: #ccc; flex-shrink: 0; }
+.msg .bubble-wrap { max-width: 70%; }
+.msg .bubble { padding: 8px 12px; border-radius: 8px; font-size: 15px; line-height: 1.4; white-space: pre-wrap; word-break: break-word; background: var(--bubble-other); }
+.msg.mine .bubble { background: var(--bubble-me); }
+.msg .time { font-size: 11px; color: var(--text-secondary); margin-top: 4px; display: none; }
+.msg.show-time .time { display: block; }
+.msg.mine .time { text-align: right; }
+
+.chat-input { display: flex; gap: 8px; padding: 8px; background: var(--bg-input); border-top: 1px solid var(--border); flex-shrink: 0; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+.chat-input input { flex: 1; padding: 8px 12px; border-radius: 4px; border: none; background: var(--bubble-other); color: var(--text); font-size: 15px; outline: none; }
+.chat-input button { padding: 8px 16px; border-radius: 4px; border: none; font-size: 14px; cursor: pointer; white-space: nowrap; }
+.btn-send { background: var(--accent); color: #fff; font-weight: 500; }
+
+.tabbar { display: flex; background: var(--bg-nav); border-top: 1px solid var(--border); flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom); }
+.tabbar button { flex: 1; padding: 8px 0; background: none; border: none; font-size: 12px; color: var(--text-secondary); display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+.tabbar button.active { color: var(--accent); }
+.tabbar button .icon { font-size: 20px; }
+
+.page-inner { padding: 12px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+.card-group { background: var(--bubble-other); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+.card-group-header { padding: 10px 12px; background: var(--bg-nav); font-size: 14px; font-weight: 500; }
+.card-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-top: 1px solid var(--border); font-size: 14px; gap: 8px; }
+.card-item .content { flex: 1; word-break: break-all; }
+.card-item .weight { font-size: 12px; color: var(--text-secondary); }
+.card-item button { background: none; border: none; color: #e74c3c; font-size: 13px; padding: 4px; cursor: pointer; }
+.add-row { display: flex; gap: 8px; margin-top: 12px; margin-bottom: 20px; }
+.add-row input { flex: 1; padding: 8px 12px; border-radius: 4px; border: 1px solid var(--border); background: var(--bubble-other); color: var(--text); font-size: 14px; outline: none; }
+.add-row button { padding: 8px 12px; border-radius: 4px; border: none; background: var(--accent); color: #fff; font-size: 14px; cursor: pointer; }
+
+.setting-row { background: var(--bubble-other); padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; gap: 12px; }
+.setting-row input[type=number] { width: 70px; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-input); color: var(--text); font-size: 14px; text-align: center; }
+.setting-row input[type=text] { flex: 1; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-input); color: var(--text); font-size: 14px; text-align: right; outline: none; }
+.section-title { font-size: 12px; color: var(--text-secondary); margin: 16px 4px 8px; }
+
+/* 弹窗样式 */
+.modal-mask { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.5); z-index: 999; justify-content: center; align-items: center; padding: 20px; }
+.modal-content { background: var(--bubble-other); padding: 16px; border-radius: 8px; width: 100%; max-width: 400px; }
+.modal-content h3 { margin-bottom: 12px; font-size: 16px; color: var(--text); }
+.modal-content textarea { width: 100%; height: 150px; padding: 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-input); color: var(--text); font-size: 14px; resize: none; outline: none; }
+.modal-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 12px; }
+.modal-btns button { padding: 8px 16px; border-radius: 4px; border: none; font-size: 14px; cursor: pointer; }
+.btn-cancel { background: var(--bg-nav); color: var(--text); }
+.btn-confirm { background: var(--accent); color: #fff; }
 </style>
 </head>
 <body>
@@ -57,11 +71,9 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-s
   <div class="page active" id="page-chat">
     <div class="chat-header" id="chat-header">对方</div>
     <div class="chat-list" id="chat-list"></div>
-    <div class="typing" id="typing" style="display:none"></div>
     <div class="chat-input">
-      <input id="msg-input" placeholder="输入消息…">
+      <input id="msg-input" placeholder="输入消息…" onkeydown="if(event.key==='Enter')sendText()">
       <button class="btn-send" onclick="sendText()">发送</button>
-      <button class="btn-speak" onclick="onSpeak()">说话</button>
     </div>
   </div>
 
@@ -70,7 +82,8 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-s
       <div id="cards-list"></div>
       <div class="add-row">
         <input id="new-card" placeholder="新字卡内容…">
-        <button onclick="addCard()">添加</button>
+        <button onclick="addCard()">单条添加</button>
+        <button onclick="openBatchModal()" style="background:#007aff">批量添加</button>
       </div>
     </div>
   </div>
@@ -80,14 +93,18 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-s
       <div class="section-title">外观</div>
       <div class="setting-row"><span>夜间模式</span><input type="checkbox" id="set-dark" onchange="updateSetting('dark',this.checked)"></div>
       <div class="setting-row"><span>系统名称</span><input type="text" id="set-name" onchange="updateSetting('sysName',this.value)"></div>
-      <div class="section-title">回复行为</div>
+      
+      <div class="section-title">自动回复（你一发送，对方就回）</div>
       <div class="setting-row"><span>回复条数</span><span><input type="number" id="set-min-count" min="1" onchange="updateSetting('minCount',+this.value)"> ~ <input type="number" id="set-max-count" min="1" onchange="updateSetting('maxCount',+this.value)"></span></div>
       <div class="setting-row"><span>延迟（秒）</span><span><input type="number" id="set-min-delay" min="1" onchange="updateSetting('minDelay',+this.value)"> ~ <input type="number" id="set-max-delay" min="1" onchange="updateSetting('maxDelay',+this.value)"></span></div>
       <div class="setting-row"><span>已读不回概率（%）</span><input type="number" id="set-no-reply" min="0" max="100" onchange="updateSetting('noReplyChance',+this.value)"></div>
-      <div class="setting-row"><span>连句功能</span><input type="checkbox" id="set-multi" onchange="updateSetting('multiEnabled',this.checked)"></div>
+      
+      <div class="section-title">主动消息（不用你发，他也会主动发）</div>
+      <div class="setting-row"><span>开启主动消息</span><input type="checkbox" id="set-proactive" onchange="updateSetting('proactiveEnabled',this.checked)"></div>
+      <div class="setting-row"><span>间隔（分钟）</span><span><input type="number" id="set-pro-min" min="1" onchange="updateSetting('proactiveMin',+this.value)"> ~ <input type="number" id="set-pro-max" min="1" onchange="updateSetting('proactiveMax',+this.value)"></span></div>
+
       <div class="section-title">数据</div>
       <div class="setting-row"><span>导出数据</span><button onclick="exportData()" style="padding:6px 12px;border-radius:4px;border:1px solid var(--border);background:var(--bg-input);color:var(--text);font-size:13px">导出</button></div>
-      <div class="setting-row"><span>导入数据</span><label style="padding:6px 12px;border-radius:4px;border:1px solid var(--border);background:var(--bg-input);color:var(--text);font-size:13px;cursor:pointer">导入<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label></div>
       <div class="setting-row"><span>重置所有数据</span><button onclick="resetData()" style="padding:6px 12px;border-radius:4px;border:1px solid #e74c3c;background:transparent;color:#e74c3c;font-size:13px">重置</button></div>
     </div>
   </div>
@@ -99,8 +116,20 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-s
   </div>
 </div>
 
+<!-- 批量添加弹窗 -->
+<div class="modal-mask" id="batch-modal">
+  <div class="modal-content">
+    <h3>批量添加字卡</h3>
+    <p style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">请每行输入一条内容</p>
+    <textarea id="batch-input" placeholder="你好呀&#10;今天吃什么&#10;我想你了"></textarea>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeBatchModal()">取消</button>
+      <button class="btn-confirm" onclick="submitBatch()">确认添加</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// 纯本地存储，无需任何外部库
 const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
 const randInt = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -108,15 +137,12 @@ const $ = id => document.getElementById(id);
 
 const defaultSettings = {
   id:'main', dark:false, sysName:'对方',
-  minCount:1, maxCount:3, minDelay:3, maxDelay:20,
-  noReplyChance:15, multiEnabled:false, separators:['，','。','…','~']
+  minCount:1, maxCount:2, minDelay:3, maxDelay:10,
+  noReplyChance:10, 
+  proactiveEnabled: false, proactiveMin: 10, proactiveMax: 30
 };
 
-let db = {
-  settings: [],
-  cards: [],
-  messages: []
-};
+let db = { settings: [], cards: [], messages: [] };
 
 function loadDB() {
   try {
@@ -142,16 +168,12 @@ function pickN(items,n) {
   for (let i=0;i<n&&pool.length;i++) { const c=weightedPick(pool); out.push(c); pool.splice(pool.findIndex(x=>x.id===c.id),1); }
   return out;
 }
-function joinSegments(segs,seps) {
-  if (segs.length<=1) return segs.join('');
-  return segs.reduce((acc,s,i)=>i===0?s:acc+seps[randInt(0,seps.length-1)]+s,'');
-}
 
 let settings = {...defaultSettings};
 
 function loadSettings() {
   let s = db.settings.find(x => x.id === 'main');
-  if (s) settings = s;
+  if (s) settings = {...settings, ...s}; 
   else { db.settings.push(settings); saveDB(); }
   
   $('set-dark').checked = settings.dark;
@@ -161,19 +183,28 @@ function loadSettings() {
   $('set-min-delay').value = settings.minDelay;
   $('set-max-delay').value = settings.maxDelay;
   $('set-no-reply').value = settings.noReplyChance;
-  $('set-multi').checked = settings.multiEnabled;
+  
+  $('set-proactive').checked = settings.proactiveEnabled;
+  $('set-pro-min').value = settings.proactiveMin;
+  $('set-pro-max').value = settings.proactiveMax;
+  
   applyTheme();
+  scheduleProactive();
 }
+
 function applyTheme() {
   document.body.classList.toggle('dark', !!settings.dark);
   $('chat-header').textContent = settings.sysName;
 }
+
 function updateSetting(key,value) {
   settings[key] = value;
   let idx = db.settings.findIndex(x => x.id === 'main');
   if (idx >= 0) db.settings[idx] = settings;
   saveDB();
   applyTheme();
+  
+  if(key.includes('proactive')) scheduleProactive();
 }
 
 function switchTab(name) {
@@ -192,7 +223,6 @@ function renderMessages() {
 }
 function renderMessageEl(m) {
   const el = document.createElement('div');
-  if (m.type==='system') { el.className='msg system'; el.textContent=m.content; return el; }
   el.className = 'msg' + (m.role==='user'?' mine':'');
   const av = document.createElement('div'); av.className='avatar';
   const wrap = document.createElement('div'); wrap.className='bubble-wrap';
@@ -205,36 +235,71 @@ function renderMessageEl(m) {
   return el;
 }
 
-function sendText() {
+// ---------- 发送消息与自动回复 ----------
+async function sendText() {
   const input = $('msg-input'); const text = input.value.trim();
   if (!text) return;
+  
+  // 1. 先发出我的消息
   db.messages.push({id:uid(),role:'user',type:'text',content:text,ts:Date.now()});
   saveDB();
   input.value=''; renderMessages();
+
+  // 2. 触发对方回复
+  autoReply();
 }
 
-async function onSpeak() {
+async function autoReply() {
+  // 根据已读不回概率，可能不回
   if (Math.random()*100 < settings.noReplyChance) return;
+  
   const cards = db.cards;
-  if (!cards.length) { alert('字卡库为空，请先到「字卡」页添加'); return; }
+  if (!cards.length) return; // 没字卡就不回
+  
   const n = randInt(settings.minCount, settings.maxCount);
   const picked = pickN(cards, n);
-  const typing = $('typing'); typing.textContent='对方正在输入…'; typing.style.display='block';
+  
   for (const card of picked) {
+    // 停顿几秒再回，模拟打字
     await sleep(randInt(settings.minDelay, settings.maxDelay)*1000);
-    let segs = [card.content];
-    if (settings.multiEnabled && cards.length>1 && Math.random()<0.3) {
-      const extra = pickN(cards.filter(c=>c.id!==card.id),1);
-      segs = [...segs, ...extra.map(e=>e.content)];
-    }
-    const content = joinSegments(segs, settings.separators);
-    db.messages.push({id:uid(),role:'other',type:'text',content,ts:Date.now()});
+    db.messages.push({id:uid(),role:'other',type:'text',content:card.content,ts:Date.now()});
     saveDB();
     renderMessages();
   }
-  typing.style.display='none';
 }
 
+// ---------- 主动消息逻辑 ----------
+let proactiveTimer = null;
+
+function scheduleProactive() {
+  if (proactiveTimer) clearTimeout(proactiveTimer);
+  if (!settings.proactiveEnabled) return;
+  
+  const min = Math.max(1, settings.proactiveMin);
+  const max = Math.max(min, settings.proactiveMax);
+  const ms = randInt(min * 60, max * 60) * 1000;
+  
+  proactiveTimer = setTimeout(() => {
+    triggerProactiveMessage();
+    scheduleProactive(); // 发完重新排下一次
+  }, ms);
+}
+
+async function triggerProactiveMessage() {
+  const cards = db.cards;
+  if (!cards.length) return;
+  const n = randInt(1, 2);
+  const picked = pickN(cards, n);
+  
+  for (const card of picked) {
+    db.messages.push({id:uid(),role:'other',type:'text',content:card.content,ts:Date.now()});
+    saveDB();
+    renderMessages();
+    await sleep(1500); 
+  }
+}
+
+// ---------- 字卡管理 ----------
 function renderCards() {
   const cards = db.cards;
   const c = $('cards-list'); c.innerHTML='';
@@ -259,12 +324,29 @@ function addCard() {
 function deleteCard(id) { if(!confirm('删除这张字卡？'))return; db.cards = db.cards.filter(x=>x.id!==id); saveDB(); renderCards(); }
 function editWeight(id) {
   const card = db.cards.find(x=>x.id===id);
-  const w = prompt('权重 1-10', String(card.weight||1));
+  const w = prompt('权重 1-10（数字越大越容易抽中）', String(card.weight||1));
   if (w===null) return;
   card.weight = Math.min(10,Math.max(1,parseInt(w)||1));
   saveDB(); renderCards();
 }
 
+// 批量添加
+function openBatchModal() { $('batch-modal').style.display = 'flex'; $('batch-input').focus(); }
+function closeBatchModal() { $('batch-modal').style.display = 'none'; }
+function submitBatch() {
+  const text = $('batch-input').value;
+  const lines = text.split('\n').map(s=>s.trim()).filter(s=>s);
+  if (!lines.length) return;
+  for (const line of lines) {
+    db.cards.push({id:uid(),content:line,weight:1,enabled:true});
+  }
+  saveDB();
+  closeBatchModal();
+  renderCards();
+  alert(`成功添加 ${lines.length} 条字卡`);
+}
+
+// ---------- 数据管理 ----------
 function exportData() {
   const data = { settings: db.settings, cards: db.cards, messages: db.messages, exportedAt:Date.now() };
   const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
@@ -272,22 +354,6 @@ function exportData() {
   a.href = URL.createObjectURL(blob);
   a.download = 'companion-backup-'+new Date().toISOString().slice(0,10)+'.json';
   a.click();
-}
-function importData(e) {
-  const file = e.target.files[0]; if (!file) return;
-  if (!confirm('导入将覆盖当前所有数据，确定？')) return;
-  const reader = new FileReader();
-  reader.onload = function(evt) {
-    try {
-      const data = JSON.parse(evt.target.result);
-      if(data.settings) db.settings = data.settings;
-      if(data.cards) db.cards = data.cards;
-      if(data.messages) db.messages = data.messages;
-      saveDB();
-      alert('导入完成，即将刷新'); location.reload();
-    } catch(err) { alert('导入失败，文件格式错误'); }
-  };
-  reader.readAsText(file);
 }
 function resetData() {
   if (!confirm('重置将清空所有数据，确定？')) return;
