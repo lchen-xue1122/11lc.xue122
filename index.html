@@ -7,200 +7,196 @@
 <title>陪伴</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--bg-chat:#EDEDED;--bg-nav:#F7F7F7;--bg-input:#F7F7F7;--bubble-other:#FFF;--bubble-me:#95EC69;--text:#111;--text-secondary:#888;--accent:#07C160;--border:rgba(0,0,0,.08);--nav-bg:rgba(255,255,255,0.85)}
-body.dark{--bg-chat:#111;--bg-nav:#1C1C1C;--bg-input:#1C1C1C;--bubble-other:#2C2C2C;--bubble-me:#3EB575;--text:#E5E5E5;--text-secondary:#888;--border:rgba(255,255,255,.08);--nav-bg:rgba(30,30,30,0.85)}
+:root{--bg-app:#F7F8FA;--bg-card:#FFF;--bg-input:#EFEFEF;--text:#111;--text-sub:#8E8E93;--accent:#007AFF;--border:#E5E5EA;--bubble-me:#007AFF;--bubble-other:#FFF;--bubble-me-text:#FFF;--bubble-other-text:#111;--nav-bg:rgba(255,255,255,0.85)}
+body.dark{--bg-app:#000;--bg-card:#1C1C1E;--bg-input:#2C2C2E;--text:#F2F2F7;--text-sub:#8E8E93;--accent:#0A84FF;--border:#38383A;--bubble-me:#0A84FF;--bubble-other:#262628;--bubble-me-text:#FFF;--bubble-other-text:#F2F2F7;--nav-bg:rgba(0,0,0,0.85)}
 html,body{height:100%;overflow:hidden}
-body{font-family:-apple-system,"PingFang SC",sans-serif;font-size:16px;color:var(--text);background:var(--bg-chat)}
-#splash{position:fixed;top:0;left:0;right:0;bottom:0;background:#111;z-index:9999;display:flex;justify-content:center;align-items:center;background-size:cover;background-position:center;transition:opacity .8s ease}
+body{font-family:-apple-system,"PingFang SC",sans-serif;font-size:16px;color:var(--text);background:var(--bg-app)}
+#splash{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:9999;display:flex;justify-content:center;align-items:center;background-size:cover;background-position:center;transition:opacity .6s ease}
 #splash.hide{opacity:0;pointer-events:none}
-#splash-text{color:#fff;font-size:24px;font-weight:bold;letter-spacing:2px;text-shadow:0 2px 4px rgba(0,0,0,.5)}
+#splash-text{color:#fff;font-size:24px;font-weight:bold;letter-spacing:2px}
 #app{display:flex;flex-direction:column;height:100vh;height:100dvh;position:relative}
-.page{flex:1;display:none;flex-direction:column;overflow:hidden}
+.page{flex:1;display:none;flex-direction:column;overflow:hidden;background:var(--bg-app)}
 .page.active{display:flex}
-#page-chat{position:relative}
-.chat-bg-layer{position:absolute;top:44px;left:0;right:0;bottom:0;background-size:cover;background-position:center;z-index:0}
-.chat-header{height:44px;background:var(--bg-nav);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:8px;font-weight:500;flex-shrink:0;z-index:10}
-.header-avatar{width:28px;height:28px;border-radius:4px;background:#ccc;background-size:cover;background-position:center;display:none}
-.chat-list{flex:1;overflow-y:auto;padding:12px 12px 90px 12px;display:flex;flex-direction:column;gap:12px;z-index:1;position:relative}
-.msg{display:flex;gap:8px}
+#page-chat{position:relative;background:transparent}
+.chat-bg-layer{position:absolute;top:50px;left:0;right:0;bottom:0;background-size:cover;background-position:center;z-index:0}
+.chat-header{height:50px;background:var(--nav-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-weight:600;flex-shrink:0;z-index:10}
+.header-left,.header-right{display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text);font-size:20px}
+.header-center{display:flex;align-items:center;gap:8px}
+.header-avatar{width:28px;height:28px;border-radius:50%;background:#ccc;background-size:cover;background-position:center;display:none}
+.chat-list{flex:1;overflow-y:auto;padding:16px 16px 100px 16px;display:flex;flex-direction:column;gap:16px;z-index:1;position:relative;-webkit-overflow-scrolling:touch}
+.msg{display:flex;gap:10px;align-items:flex-start}
 .msg.mine{flex-direction:row-reverse}
-.msg .avatar{width:40px;height:40px;border-radius:4px;background:#ccc;background-size:cover;background-position:center;flex-shrink:0}
+.msg .avatar{width:36px;height:36px;border-radius:50%;background:var(--bg-input);background-size:cover;background-position:center;flex-shrink:0}
 .msg .bubble-wrap{max-width:75%;display:flex;flex-direction:column}
 .msg.mine .bubble-wrap{align-items:flex-end}
-.msg .bubble{padding:8px 12px;border-radius:8px;font-size:15px;line-height:1.4;white-space:pre-wrap;word-break:break-word;background:var(--bubble-other);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)}
-.msg.mine .bubble{background:var(--bubble-me)}
+.msg .bubble{padding:10px 16px;border-radius:20px;font-size:16px;line-height:1.4;white-space:pre-wrap;word-break:break-word;background:var(--bubble-other);color:var(--bubble-other-text);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+.msg.mine .bubble{background:var(--bubble-me);color:var(--bubble-me-text);border-bottom-right-radius:4px}
+.msg:not(.mine) .bubble{border-bottom-left-radius:4px}
 .msg .bubble.img-sticker{background:transparent!important;padding:0;box-shadow:none}
-.msg .bubble.img-sticker img{max-width:120px;max-height:120px;border-radius:8px;display:block}
-.quote-box{background:rgba(0,0,0,.05);font-size:12px;padding:4px 8px;border-radius:4px;margin-bottom:4px;color:var(--text-secondary);border-left:2px solid var(--accent);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.msg-status{font-size:10px;color:var(--text-secondary);margin-top:4px;text-align:right}
-.msg .time{font-size:11px;color:var(--text-secondary);margin-top:4px;display:none}
+.msg .bubble.img-sticker img{max-width:120px;max-height:120px;border-radius:12px;display:block}
+.quote-box{background:rgba(0,0,0,0.05);font-size:12px;padding:6px 10px;border-radius:8px;margin-bottom:4px;color:var(--text-sub);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+body.dark .quote-box{background:rgba(255,255,255,0.1)}
+.msg-status{font-size:10px;color:var(--text-sub);margin-top:4px;text-align:right;opacity:0.8}
+.msg .time{font-size:11px;color:var(--text-sub);margin-top:4px;display:none;text-align:center;}
 .msg.show-time .time{display:block}
-.msg.system{justify-content:center;font-size:12px;color:var(--text-secondary);padding:4px 0;text-shadow:0 1px 2px rgba(0,0,0,.2)}
-.chat-input{display:flex;gap:6px;padding:8px;background:var(--bg-input);border-top:1px solid var(--border);flex-shrink:0;align-items:center;padding-bottom:max(8px,env(safe-area-inset-bottom));z-index:10}
-.chat-input input[type="text"]{flex:1;padding:8px 12px;border-radius:4px;border:none;background:var(--bubble-other);color:var(--text);font-size:15px;outline:none;box-shadow:0 1px 2px rgba(0,0,0,.05)}
-.chat-input button{padding:8px 12px;border-radius:4px;border:none;font-size:14px;cursor:pointer;white-space:nowrap;background:var(--accent);color:#fff;font-weight:500}
-.btn-emoji{background:var(--bg-nav)!important;color:var(--text)!important;font-size:18px;padding:4px 8px!important}
-.tabbar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);width:90%;max-width:400px;background:var(--nav-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:30px;display:flex;justify-content:space-around;padding:8px 0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,.1)}
-.tabbar button{background:none;border:none;font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;transition:all .2s;flex:1}
-.tabbar button.active{color:var(--accent);transform:scale(1.1)}
-.tabbar button .icon{font-size:20px}
-.page-inner{padding:12px;overflow-y:auto;flex:1;padding-bottom:100px}
-.setting-row{background:var(--bubble-other);padding:12px;border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-size:14px;gap:12px}
-.setting-row input[type=number]{width:70px;padding:4px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg-input);color:var(--text);text-align:center}
-.setting-row input[type=text]{flex:1;padding:4px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg-input);color:var(--text);text-align:right;outline:none}
-.section-title{font-size:12px;color:var(--text-secondary);margin:16px 4px 8px}
-.btn-upload{padding:4px 10px;border-radius:4px;border:1px solid var(--border);background:var(--bg-input);color:var(--text);font-size:13px;cursor:pointer}
-.btn-danger{padding:6px 12px;border-radius:4px;border:1px solid #e74c3c;background:transparent;color:#e74c3c;font-size:13px;cursor:pointer}
-.card-group{background:var(--bubble-other);border-radius:8px;margin-bottom:12px;overflow:hidden}
-.card-group-header{padding:10px 12px;background:var(--bg-nav);font-size:14px;font-weight:500}
-.card-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-top:1px solid var(--border);font-size:14px;gap:8px}
+.msg.system{justify-content:center;font-size:12px;color:var(--text-sub);padding:4px 0}
+.chat-input{position:fixed;bottom:0;left:0;right:0;display:flex;gap:10px;padding:12px 16px;background:transparent;align-items:flex-end;padding-bottom:max(16px,env(safe-area-inset-bottom));z-index:10}
+.chat-input .input-wrapper{flex:1;display:flex;align-items:center;background:var(--bg-input);border-radius:22px;padding:4px 12px;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
+.chat-input input[type="text"]{flex:1;padding:8px;border:none;background:transparent;color:var(--text);font-size:16px;outline:none}
+.btn-emoji{background:none!important;color:var(--text-sub)!important;font-size:22px;padding:4px!important;line-height:1;box-shadow:none!important;border:none;cursor:pointer}
+.btn-send{padding:0!important;width:38px;height:38px;border-radius:50%!important;background:var(--accent)!important;color:#fff!important;display:flex;justify-content:center;align-items:center;font-size:18px!important;box-shadow:0 4px 10px rgba(0,122,255,0.3)!important;flex-shrink:0;border:none;cursor:pointer;margin-bottom:2px}
+.drawer-mask{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:1000;display:none;opacity:0;transition:opacity 0.3s}
+.drawer-mask.show{display:block;opacity:1}
+.drawer{position:fixed;top:0;left:-280px;width:280px;height:100%;background:var(--bg-card);z-index:1001;transition:left 0.3s cubic-bezier(0.25,0.8,0.25,1);padding:20px;display:flex;flex-direction:column;border-right:1px solid var(--border)}
+.drawer.show{left:0}
+.drawer-title{font-size:20px;font-weight:bold;margin-bottom:20px;color:var(--text)}
+.drawer-item{display:flex;align-items:center;gap:12px;padding:14px 10px;font-size:16px;color:var(--text);border-radius:10px;cursor:pointer;margin-bottom:4px}
+.drawer-item:active{background:var(--bg-input)}
+.page-inner{padding:16px;overflow-y:auto;flex:1;padding-bottom:40px;-webkit-overflow-scrolling:touch}
+.setting-row{background:var(--bg-card);padding:14px 16px;border-radius:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;font-size:15px;gap:12px}
+.setting-row input[type=number]{width:60px;padding:6px;border-radius:6px;border:1px solid var(--border);background:var(--bg-input);color:var(--text);text-align:center}
+.setting-row input[type=text]{flex:1;padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg-input);color:var(--text);text-align:right;outline:none}
+.section-title{font-size:13px;color:var(--text-sub);margin:20px 4px 10px;font-weight:600}
+.btn-upload{padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg-input);color:var(--text);font-size:13px;cursor:pointer}
+.btn-danger{padding:6px 12px;border-radius:8px;border:1px solid #FF3B30;background:transparent;color:#FF3B30;font-size:13px;cursor:pointer}
+.card-group{background:var(--bg-card);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.card-group-header{padding:12px 16px;background:var(--bg-input);font-size:14px;font-weight:600}
+.card-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-top:1px solid var(--border);font-size:15px;gap:10px}
 .card-item .content{flex:1;word-break:break-all}
-.card-item button{background:none;border:none;color:#e74c3c;font-size:13px;padding:4px;cursor:pointer}
-.add-row{display:flex;gap:8px;margin-top:12px;margin-bottom:20px}
-.add-row input{flex:1;padding:8px 12px;border-radius:4px;border:1px solid var(--border);background:var(--bubble-other);color:var(--text);outline:none}
-.add-row button{padding:8px 12px;border-radius:4px;border:none;background:var(--accent);color:#fff;font-size:14px}
-.modal-mask{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:999;justify-content:center;align-items:center;padding:20px}
-.modal-content{background:var(--bubble-other);padding:16px;border-radius:8px;width:100%;max-width:400px;max-height:80vh;display:flex;flex-direction:column}
-.modal-content h3{margin-bottom:12px;font-size:16px}
-.modal-content textarea{width:100%;flex:1;min-height:100px;padding:8px;border-radius:4px;border:1px solid var(--border);background:var(--bg-input);color:var(--text);resize:none;outline:none;margin-bottom:8px}
-.modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
-.modal-btns button{padding:8px 16px;border-radius:4px;border:none;cursor:pointer}
-.btn-cancel{background:var(--bg-nav);color:var(--text)}
+.card-item button{background:none;border:none;color:#FF3B30;font-size:14px;padding:4px;cursor:pointer}
+.add-row{display:flex;gap:10px;margin-top:16px}
+.add-row input{flex:1;padding:10px 16px;border-radius:22px;border:1px solid var(--border);background:var(--bg-card);color:var(--text);outline:none}
+.add-row button{padding:10px 20px;border-radius:22px;border:none;background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+.moment{background:var(--bg-card);border-radius:12px;padding:16px;margin-bottom:12px}
+.moment-head{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.moment-avatar{width:36px;height:36px;border-radius:50%;background:var(--bg-input);background-size:cover}
+.moment-name{font-size:15px;font-weight:600;color:var(--text)}
+.moment-text{font-size:15px;margin-bottom:10px;line-height:1.5}
+.moment-foot{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-sub);margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.modal-mask{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:999;justify-content:center;align-items:center;padding:20px}
+.modal-content{background:var(--bg-card);padding:20px;border-radius:16px;width:100%;max-width:400px;max-height:80vh;display:flex;flex-direction:column}
+.modal-content h3{margin-bottom:12px;font-size:18px;text-align:center}
+.modal-content textarea{width:100%;flex:1;min-height:120px;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--bg-input);color:var(--text);resize:none;outline:none;margin-bottom:10px}
+.modal-btns{display:flex;gap:10px;justify-content:center;margin-top:10px}
+.modal-btns button{flex:1;padding:12px;border-radius:12px;border:none;cursor:pointer;font-size:15px;font-weight:600}
+.btn-cancel{background:var(--bg-input);color:var(--text)}
 .btn-confirm{background:var(--accent);color:#fff}
-.emoji-panel{display:none;padding:10px;background:var(--bg-input);border-top:1px solid var(--border);flex-wrap:wrap;gap:12px;font-size:24px;max-height:200px;overflow-y:auto}
+.emoji-panel{display:none;padding:12px;background:var(--bg-card);border-top:1px solid var(--border);flex-wrap:wrap;gap:14px;font-size:24px;max-height:200px;overflow-y:auto;position:fixed;bottom:70px;left:0;right:0;z-index:20;border-radius:16px 16px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,0.1)}
 .emoji-panel span{cursor:pointer}
-.emoji-panel img{width:40px;height:40px;object-fit:cover;border-radius:4px;cursor:pointer}
-.emoji-tabs{display:flex;gap:10px;margin-bottom:10px;width:100%;border-bottom:1px solid var(--border);padding-bottom:5px}
-.emoji-tabs div{font-size:14px;cursor:pointer;color:var(--text-secondary)}
-.emoji-tabs div.active{color:var(--accent);font-weight:bold}
-.theme-btn{display:inline-block;padding:6px 10px;border-radius:4px;margin-right:8px;margin-bottom:8px;cursor:pointer;border:1px solid var(--border);font-size:12px}
+.emoji-panel img{width:40px;height:40px;object-fit:cover;border-radius:8px;cursor:pointer}
+.emoji-tabs{display:flex;gap:16px;margin-bottom:12px;width:100%;border-bottom:1px solid var(--border);padding-bottom:8px}
+.emoji-tabs div{font-size:14px;font-weight:600;cursor:pointer;color:var(--text-sub)}
+.emoji-tabs div.active{color:var(--accent)}
 .color-picker{width:32px;height:32px;border:none;padding:0;background:none;cursor:pointer}
 </style>
 </head>
 <body>
 <div id="splash"><div id="splash-text">陪伴</div></div>
 <div id="app">
-  <!-- 聊天 -->
+  <div class="drawer-mask" id="drawer-mask" onclick="toggleDrawer()"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-title">菜单</div>
+    <div class="drawer-item" onclick="openPage('page-cards')">🃏 字卡库</div>
+    <div class="drawer-item" onclick="openPage('page-quiz')">📝 问卷出题</div>
+    <div class="drawer-item" onclick="openPage('page-settings')">⚙️ 高级设置</div>
+  </div>
+
   <div class="page active" id="page-chat">
     <div class="chat-bg-layer" id="chat-bg-layer"></div>
-    <div class="chat-header"><div class="header-avatar" id="header-avatar"></div><span id="header-name">对方</span></div>
+    <div class="chat-header">
+      <div class="header-left" onclick="toggleDrawer()">☰</div>
+      <div class="header-center"><div class="header-avatar" id="header-avatar"></div><span id="header-name">对方</span></div>
+      <div class="header-right" onclick="openPage('page-moments')">🌐</div>
+    </div>
     <div class="chat-list" id="chat-list"></div>
     <div class="emoji-panel" id="emoji-panel">
-      <div class="emoji-tabs">
-        <div class="active" onclick="switchEmojiTab('emoji')">Emoji</div>
-        <div onclick="switchEmojiTab('sticker')">表情包</div>
-      </div>
+      <div class="emoji-tabs"><div class="active" onclick="switchEmojiTab('emoji')">Emoji</div><div onclick="switchEmojiTab('sticker')">表情包</div></div>
       <div id="emoji-tab-content" style="display:flex;flex-wrap:wrap;gap:12px;width:100%;"></div>
     </div>
     <div class="chat-input">
-      <button class="btn-emoji" onclick="toggleEmoji()">😀</button>
-      <input type="text" id="msg-input" placeholder="输入消息…" onkeydown="if(event.key==='Enter')sendText()">
-      <button onclick="sendText()">发送</button>
+      <div class="input-wrapper">
+        <button class="btn-emoji" onclick="toggleEmoji()">😊</button>
+        <input type="text" id="msg-input" placeholder="发消息…" onkeydown="if(event.key==='Enter')sendText()">
+      </div>
+      <button class="btn-send" onclick="sendText()">↑</button>
     </div>
   </div>
 
-  <!-- 问卷 -->
-  <div class="page" id="page-quiz">
-    <div class="chat-header">问卷出题</div>
+  <div class="page" id="page-cards">
+    <div class="chat-header"><div class="header-left" onclick="closePage('page-cards')">←</div><div class="header-center">字卡库</div><div class="header-right"></div></div>
     <div class="page-inner">
-      <div class="setting-row"><input type="text" id="q-title" placeholder="你要问他的问题..."></div>
+      <div id="cards-list"></div>
+      <div class="add-row"><input id="new-card" placeholder="新字卡..."><button onclick="addCard()">添加</button><button onclick="openModal('batch-modal')" style="background:var(--text-sub)">批量</button></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-quiz">
+    <div class="chat-header"><div class="header-left" onclick="closePage('page-quiz')">←</div><div class="header-center">问卷出题</div><div class="header-right"></div></div>
+    <div class="page-inner">
+      <div class="setting-row"><input type="text" id="q-title" placeholder="要问他的问题..."></div>
       <div class="setting-row"><input type="text" id="q-a" placeholder="选项 A"></div>
       <div class="setting-row"><input type="text" id="q-b" placeholder="选项 B"></div>
       <div class="setting-row"><input type="text" id="q-c" placeholder="选项 C"></div>
       <div class="setting-row"><input type="text" id="q-d" placeholder="选项 D"></div>
-      <button onclick="submitQuiz()" style="width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:16px;margin-top:10px;">让他作答</button>
-      <div class="section-title">历史问卷</div>
-      <div id="quiz-list"></div>
+      <button onclick="submitQuiz()" style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;margin-top:12px;">让他作答</button>
+      <div class="section-title">历史问卷</div><div id="quiz-list"></div>
     </div>
   </div>
 
-  <!-- 朋友圈 -->
   <div class="page" id="page-moments">
-    <div class="chat-header">朋友圈</div>
+    <div class="chat-header"><div class="header-left" onclick="closePage('page-moments')">←</div><div class="header-center">朋友圈</div><div class="header-right"></div></div>
     <div class="page-inner" id="moments-list"></div>
-    <div class="chat-input" style="padding-bottom: 90px;">
-      <input type="text" id="moment-input" placeholder="这一刻的想法…">
-      <button onclick="postMoment()">发布</button>
+    <div style="position:fixed;bottom:20px;left:16px;right:16px;display:flex;gap:10px;z-index:10;">
+      <input type="text" id="moment-input" placeholder="这一刻的想法…" style="flex:1;padding:12px 16px;border-radius:22px;border:none;background:var(--bg-card);box-shadow:0 2px 10px rgba(0,0,0,0.1);outline:none;color:var(--text)">
+      <button onclick="postMoment()" style="padding:0 20px;border-radius:22px;background:var(--accent);color:#fff;font-weight:600;border:none;">发布</button>
     </div>
   </div>
 
-  <!-- 字卡 -->
-  <div class="page" id="page-cards">
-    <div class="page-inner">
-      <div id="cards-list"></div>
-      <div class="add-row">
-        <input id="new-card" placeholder="单条添加…">
-        <button onclick="addCard()">添加</button>
-        <button onclick="openModal('batch-modal')" style="background:#007aff">批量</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 设置 -->
   <div class="page" id="page-settings">
+    <div class="chat-header"><div class="header-left" onclick="closePage('page-settings')">←</div><div class="header-center">设置</div><div class="header-right"></div></div>
     <div class="page-inner">
-      <div class="section-title">自定义美化 (点色块调色)</div>
-      <div class="setting-row">
-        <span>我的气泡色</span><input type="color" id="color-me" class="color-picker" onchange="updateSetting('colorMe',this.value);applyTheme()">
-      </div>
-      <div class="setting-row">
-        <span>对方气泡色</span><input type="color" id="color-other" class="color-picker" onchange="updateSetting('colorOther',this.value);applyTheme()">
-      </div>
-      <div class="setting-row">
-        <span>主题强调色</span><input type="color" id="color-accent" class="color-picker" onchange="updateSetting('colorAccent',this.value);applyTheme()">
-      </div>
+      <div class="section-title">美化调色</div>
+      <div class="setting-row"><span>我的气泡</span><input type="color" id="color-me" class="color-picker" onchange="updateSetting('colorMe',this.value);applyTheme()"></div>
+      <div class="setting-row"><span>对方气泡</span><input type="color" id="color-other" class="color-picker" onchange="updateSetting('colorOther',this.value);applyTheme()"></div>
+      <div class="setting-row"><span>强调色</span><input type="color" id="color-accent" class="color-picker" onchange="updateSetting('colorAccent',this.value);applyTheme()"></div>
       <div class="setting-row"><span>夜间模式</span><input type="checkbox" id="set-dark" onchange="updateSetting('dark',this.checked);applyTheme()"></div>
       
-      <div class="section-title">头像与背景</div>
-      <div class="setting-row"><span>系统名称</span><input type="text" id="set-name" onchange="updateSetting('sysName',this.value);applyTheme()"></div>
+      <div class="section-title">角色与背景</div>
+      <div class="setting-row"><span>对方名字</span><input type="text" id="set-name" onchange="updateSetting('sysName',this.value);applyTheme()"></div>
       <div class="setting-row"><span>对方头像</span><label class="btn-upload">选择<input type="file" accept="image/*" style="display:none" onchange="uploadImage(event, 'otherAvatar')"></label></div>
       <div class="setting-row"><span>我的头像</span><label class="btn-upload">选择<input type="file" accept="image/*" style="display:none" onchange="uploadImage(event, 'myAvatar')"></label></div>
-      <div class="setting-row"><span>聊天背景图</span><label class="btn-upload">选择<input type="file" accept="image/*" style="display:none" onchange="uploadImage(event, 'chatBg')"></label></div>
-      <div class="setting-row"><span>开屏背景图</span><label class="btn-upload">选择<input type="file" accept="image/*" style="display:none" onchange="uploadImage(event, 'splashImage')"></label></div>
+      <div class="setting-row"><span>聊天背景</span><label class="btn-upload">选择<input type="file" accept="image/*" style="display:none" onchange="uploadImage(event, 'chatBg')"></label></div>
+      <div class="setting-row"><span>开屏背景</span><label class="btn-upload">选择<input type="file" accept="image/*" style="display:none" onchange="uploadImage(event, 'splashImage')"></label></div>
       <div class="setting-row"><span>时间戳常显</span><input type="checkbox" id="set-time" onchange="updateSetting('alwaysShowTime',this.checked);renderMessages()"></div>
       
-      <div class="section-title">表情包（去设置添加）</div>
-      <div class="setting-row">
-        <span>添加自定义图片</span>
-        <label class="btn-upload" style="background:var(--accent);color:#fff;border:none;">选择<input type="file" accept="image/*" style="display:none" onchange="uploadSticker(event)"></label>
-      </div>
+      <div class="section-title">表情包管理</div>
+      <div class="setting-row"><span>添加新图</span><label class="btn-upload" style="background:var(--accent);color:#fff;border:none;">选择<input type="file" accept="image/*" style="display:none" onchange="uploadSticker(event)"></label></div>
       <div id="sticker-manage-list" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;"></div>
 
-      <div class="section-title">回复设置</div>
-      <div class="setting-row"><span>回复条数</span><span><input type="number" id="set-min-count" min="1" onchange="updateSetting('minCount',+this.value)"> ~ <input type="number" id="set-max-count" min="1" onchange="updateSetting('maxCount',+this.value)"></span></div>
+      <div class="section-title">回复逻辑</div>
+      <div class="setting-row"><span>条数</span><span><input type="number" id="set-min-count" min="1" onchange="updateSetting('minCount',+this.value)"> ~ <input type="number" id="set-max-count" min="1" onchange="updateSetting('maxCount',+this.value)"></span></div>
       <div class="setting-row"><span>延迟(秒)</span><span><input type="number" id="set-min-delay" min="1" onchange="updateSetting('minDelay',+this.value)"> ~ <input type="number" id="set-max-delay" min="1" onchange="updateSetting('maxDelay',+this.value)"></span></div>
-      <div class="setting-row"><span>已读不回(%)</span><input type="number" id="set-no-reply" min="0" max="100" onchange="updateSetting('noReplyChance',+this.value)"></div>
+      <div class="setting-row"><span>不回概率(%)</span><input type="number" id="set-no-reply" min="0" max="100" onchange="updateSetting('noReplyChance',+this.value)"></div>
       <div class="setting-row"><span>连句功能</span><input type="checkbox" id="set-multi" onchange="updateSetting('multiEnabled',this.checked)"></div>
       
       <div class="section-title">主动消息</div>
-      <div class="setting-row"><span>开启主动消息</span><input type="checkbox" id="set-proactive" onchange="updateSetting('proactiveEnabled',this.checked);scheduleProactive()"></div>
+      <div class="setting-row"><span>开启</span><input type="checkbox" id="set-proactive" onchange="updateSetting('proactiveEnabled',this.checked);scheduleProactive()"></div>
       <div class="setting-row"><span>间隔(分钟)</span><span><input type="number" id="set-pro-min" min="1" onchange="updateSetting('proactiveMin',+this.value);scheduleProactive()"> ~ <input type="number" id="set-pro-max" min="1" onchange="updateSetting('proactiveMax',+this.value);scheduleProactive()"></span></div>
 
       <div class="section-title">数据</div>
       <div class="setting-row"><span>导出备份</span><button onclick="exportData()" class="btn-upload">导出</button></div>
       <div class="setting-row"><span>导入恢复</span><label class="btn-upload">导入<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label></div>
-      <div class="setting-row"><span>重置全部数据</span><button onclick="resetData()" class="btn-danger">重置</button></div>
+      <div class="setting-row"><span>重置</span><button onclick="resetData()" class="btn-danger">重置</button></div>
     </div>
-  </div>
-
-  <div class="tabbar">
-    <button class="active" data-page="chat" onclick="switchTab('chat')"><span class="icon">💬</span>聊天</button>
-    <button data-page="quiz" onclick="switchTab('quiz')"><span class="icon">📝</span>问卷</button>
-    <button data-page="moments" onclick="switchTab('moments')"><span class="icon">🌐</span>朋友圈</button>
-    <button data-page="cards" onclick="switchTab('cards')"><span class="icon">🃏</span>字卡</button>
-    <button data-page="settings" onclick="switchTab('settings')"><span class="icon">⚙️</span>设置</button>
   </div>
 </div>
 
 <div class="modal-mask" id="batch-modal">
   <div class="modal-content">
     <h3>批量添加字卡</h3>
-    <p style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">每行一条。支持 <b># 分组名</b>。<br>支持 <b>|w3</b> 表示权重3。</p>
-    <textarea id="batch-input" placeholder="# 日常&#10;你好&#10;吃饭了吗|w3"></textarea>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal('batch-modal')">取消</button>
-      <button class="btn-confirm" onclick="submitBatch()">确认</button>
-    </div>
+    <p style="font-size:12px;color:var(--text-sub);margin-bottom:8px;"># 分组名<br>卡片内容 |w3 (权重3)</p>
+    <textarea id="batch-input" placeholder="# 日常&#10;你好&#10;吃了吗|w3"></textarea>
+    <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('batch-modal')">取消</button><button class="btn-confirm" onclick="submitBatch()">确定</button></div>
   </div>
 </div>
 
@@ -209,13 +205,12 @@ const $=id=>document.getElementById(id);
 const uid=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
 const rInt=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-
-const defSet={id:'main',dark:false,sysName:'对方',colorMe:'#95EC69',colorOther:'#FFFFFF',colorAccent:'#07C160',otherAvatar:'',myAvatar:'',chatBg:'',splashImage:'',minCount:1,maxCount:2,minDelay:3,maxDelay:10,noReplyChance:10,multiEnabled:false,alwaysShowTime:false,proactiveEnabled:false,proactiveMin:10,proactiveMax:30};
+const defSet={id:'main',dark:false,sysName:'对方',colorMe:'#007AFF',colorOther:'#FFFFFF',colorAccent:'#007AFF',otherAvatar:'',myAvatar:'',chatBg:'',splashImage:'',minCount:1,maxCount:2,minDelay:3,maxDelay:10,noReplyChance:10,multiEnabled:false,alwaysShowTime:false,proactiveEnabled:false,proactiveMin:10,proactiveMax:30};
 let db={settings:[],cards:[],messages:[],moments:[],stickers:[],quizzes:[]};
 let settings={...defSet},currentEmojiTab='emoji';
 
 function loadDB(){try{['settings','cards','messages','moments','stickers','quizzes'].forEach(k=>db[k]=JSON.parse(localStorage.getItem(k)||'[]'));}catch(e){}}
-function saveDB(){try{['settings','cards','messages','moments','stickers','quizzes'].forEach(k=>localStorage.setItem(k,JSON.stringify(db[k])));}catch(e){alert('存储空间不足！');}}
+function saveDB(){try{['settings','cards','messages','moments','stickers','quizzes'].forEach(k=>localStorage.setItem(k,JSON.stringify(db[k])));}catch(e){alert('存储已满');}}
 
 function loadSettings(){
   let s=db.settings.find(x=>x.id==='main');
@@ -273,14 +268,15 @@ function renderStickerManager(){
 }
 function delSticker(id){db.stickers=db.stickers.filter(x=>x.id!==id);saveDB();renderStickerManager();}
 
-function switchTab(n){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tabbar button').forEach(b=>b.classList.remove('active'));
-  $('page-'+n).classList.add('active');document.querySelector(`.tabbar button[data-page="${n}"]`).classList.add('active');
-  if(n==='cards')renderCards();if(n==='moments')renderMoments();if(n==='quiz')renderQuizHistory();
+function toggleDrawer(){
+  const d=$('drawer'),m=$('drawer-mask');
+  if(d.classList.contains('show')){d.classList.remove('show');m.classList.remove('show');}
+  else{d.classList.add('show');m.classList.add('show');}
 }
+function openPage(id){toggleDrawer();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');if(id==='page-cards')renderCards();if(id==='page-moments')renderMoments();if(id==='page-quiz')renderQuizHistory();}
+function closePage(id){$(id).classList.remove('active');$('page-chat').classList.add('active');}
 function openModal(id){$(id).style.display='flex';}function closeModal(id){$(id).style.display='none';}
 
-// 聊天逻辑
 function renderMessages(){
   const list=$('chat-list');list.innerHTML='';
   [...db.messages].sort((a,b)=>a.ts-b.ts).forEach(m=>list.appendChild(renderMsgEl(m)));
@@ -344,7 +340,6 @@ async function autoReply(userText){
   }
 }
 
-// 问卷逻辑
 function submitQuiz(){
   let t=$('q-title').value.trim();let o=[$('q-a').value,$('q-b').value,$('q-c').value,$('q-d').value].map(x=>x.trim()).filter(x=>x);
   if(!t||o.length<2)return alert('请填写题目和至少两个选项');
@@ -353,16 +348,15 @@ function submitQuiz(){
   db.messages.push({id:uid(),role:'other',type:'text',content:`关于“${t}”，我选：${pick}`,ts:Date.now()});saveDB();
   renderMessages();renderQuizHistory();
   $('q-title').value='';$('q-a').value='';$('q-b').value='';$('q-c').value='';$('q-d').value='';
-  switchTab('chat');
+  closePage('page-quiz');
 }
 function renderQuizHistory(){
   const l=$('quiz-list');l.innerHTML='';
   [...db.quizzes].sort((a,b)=>b.ts-a.ts).forEach(q=>{
-    l.innerHTML+=`<div class="setting-row" style="flex-direction:column;align-items:flex-start;font-size:13px;"><div style="font-weight:bold;">Q: ${q.t}</div><div style="color:var(--text-secondary);margin:4px 0;">选项: ${q.o.join(' / ')}</div><div style="color:var(--accent);">他选择了: ${q.pick}</div></div>`;
+    l.innerHTML+=`<div class="setting-row" style="flex-direction:column;align-items:flex-start;font-size:13px;"><div style="font-weight:bold;">Q: ${q.t}</div><div style="color:var(--text-sub);margin:4px 0;">选项: ${q.o.join(' / ')}</div><div style="color:var(--accent);">他选择了: ${q.pick}</div></div>`;
   });
 }
 
-// 朋友圈逻辑
 function renderMoments(){
   const l=$('moments-list');l.innerHTML='';
   const ms=[...db.moments].sort((a,b)=>b.ts-a.ts);
@@ -379,7 +373,6 @@ function renderMoments(){
 function postMoment(){const t=$('moment-input').value.trim();if(!t)return;db.moments.push({id:uid(),author:'user',content:t,ts:Date.now(),likes:[]});saveDB();$('moment-input').value='';renderMoments();}
 function toggleLike(id){const m=db.moments.find(x=>x.id===id);if(!m)return;const i=m.likes.indexOf('user');if(i>=0)m.likes.splice(i,1);else m.likes.push('user');saveDB();renderMoments();}
 
-// 字卡逻辑
 function renderCards(){
   const c=$('cards-list');c.innerHTML='';const cards=db.cards;
   if(!cards.length){c.innerHTML='<div style="text-align:center;color:#888;padding:40px;font-size:14px;">还没有字卡</div>';return;}
@@ -408,7 +401,6 @@ function submitBatch(){
   saveDB();closeModal('batch-modal');renderCards();alert(`成功添加 ${cnt} 条`);
 }
 
-// 主动消息
 let proTimer=null;
 function scheduleProactive(){
   if(proTimer)clearTimeout(proTimer);
@@ -420,7 +412,6 @@ function scheduleProactive(){
   },rInt(min*60,max*60)*1000);
 }
 
-// 数据管理
 function exportData(){
   const d={settings:db.settings,cards:db.cards,messages:db.messages,moments:db.moments,stickers:db.stickers,quizzes:db.quizzes};
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:'application/json'}));a.download='companion-bak.json';a.click();
@@ -433,8 +424,7 @@ function importData(e){
 }
 function resetData(){if(!confirm('清空所有数据？'))return;db={settings:[],cards:[],messages:[],moments:[],stickers:[],quizzes:[]};saveDB();location.reload();}
 
-// 初始化
 loadDB();loadSettings();renderMessages();renderCards();renderMoments();renderQuizHistory();
 </script>
 </body>
-</html>
+  </html>
