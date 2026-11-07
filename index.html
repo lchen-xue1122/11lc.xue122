@@ -1,21 +1,19 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" translate="no">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="google" content="notranslate">
 <title>陪伴</title>
-<script src="https://cdn.jsdelivr.net/npm/dexie@4/dist/dexie.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg-chat:#EDEDED;--bg-nav:#F7F7F7;--bg-input:#F7F7F7;--bubble-other:#FFF;--bubble-me:#95EC69;--text:#111;--text-secondary:#888;--accent:#07C160;--border:rgba(0,0,0,.08)}
 body.dark{--bg-chat:#111;--bg-nav:#1C1C1C;--bg-input:#1C1C1C;--bubble-other:#2C2C2C;--bubble-me:#3EB575;--text:#E5E5E5;--text-secondary:#888;--border:rgba(255,255,255,.08)}
-html,body{height:100%}
-body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:16px;color:var(--text);background:var(--bg-chat);overflow:hidden}
-#app{height:100%;display:flex;flex-direction:column}
-.page{flex:1;overflow-y:auto;display:none}
-.page.active{display:block}
-#page-chat{padding:0}
-#page-chat.active{display:flex;flex-direction:column}
+html,body{height:100%;overflow:hidden}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:16px;color:var(--text);background:var(--bg-chat)}
+#app{height:100vh;height:100dvh;display:flex;flex-direction:column}
+.page{flex:1;overflow-y:auto;display:none;flex-direction:column}
+.page.active{display:flex}
 .tabbar{display:flex;background:var(--bg-nav);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom);flex-shrink:0}
 .tabbar button{flex:1;padding:8px 0;background:none;border:none;font-size:12px;color:var(--text-secondary);display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
 .tabbar button.active{color:var(--accent)}
@@ -102,8 +100,11 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-s
 </div>
 
 <script>
-const db = new Dexie('companion');
-db.version(1).stores({ settings:'id', cards:'id', messages:'id,ts' });
+// 纯本地存储，无需任何外部库
+const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
+const randInt = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const $ = id => document.getElementById(id);
 
 const defaultSettings = {
   id:'main', dark:false, sysName:'对方',
@@ -111,10 +112,24 @@ const defaultSettings = {
   noReplyChance:15, multiEnabled:false, separators:['，','。','…','~']
 };
 
-const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
-const randInt = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-const $ = id => document.getElementById(id);
+let db = {
+  settings: [],
+  cards: [],
+  messages: []
+};
+
+function loadDB() {
+  try {
+    db.settings = JSON.parse(localStorage.getItem('settings') || '[]');
+    db.cards = JSON.parse(localStorage.getItem('cards') || '[]');
+    db.messages = JSON.parse(localStorage.getItem('messages') || '[]');
+  } catch(e) {}
+}
+function saveDB() {
+  localStorage.setItem('settings', JSON.stringify(db.settings));
+  localStorage.setItem('cards', JSON.stringify(db.cards));
+  localStorage.setItem('messages', JSON.stringify(db.messages));
+}
 
 function weightedPick(items) {
   const total = items.reduce((s,i)=>s+Math.max(1,i.weight||1),0);
@@ -134,9 +149,11 @@ function joinSegments(segs,seps) {
 
 let settings = {...defaultSettings};
 
-async function loadSettings() {
-  const s = await db.settings.get('main');
-  if (s) settings = s; else await db.settings.add(settings);
+function loadSettings() {
+  let s = db.settings.find(x => x.id === 'main');
+  if (s) settings = s;
+  else { db.settings.push(settings); saveDB(); }
+  
   $('set-dark').checked = settings.dark;
   $('set-name').value = settings.sysName;
   $('set-min-count').value = settings.minCount;
@@ -151,9 +168,11 @@ function applyTheme() {
   document.body.classList.toggle('dark', !!settings.dark);
   $('chat-header').textContent = settings.sysName;
 }
-async function updateSetting(key,value) {
+function updateSetting(key,value) {
   settings[key] = value;
-  await db.settings.update('main',{[key]:value});
+  let idx = db.settings.findIndex(x => x.id === 'main');
+  if (idx >= 0) db.settings[idx] = settings;
+  saveDB();
   applyTheme();
 }
 
@@ -165,8 +184,8 @@ function switchTab(name) {
   if (name==='cards') renderCards();
 }
 
-async function renderMessages() {
-  const msgs = await db.messages.orderBy('ts').toArray();
+function renderMessages() {
+  const msgs = [...db.messages].sort((a,b)=>a.ts-b.ts);
   const list = $('chat-list'); list.innerHTML='';
   for (const m of msgs) list.appendChild(renderMessageEl(m));
   list.scrollTop = list.scrollHeight;
@@ -186,16 +205,17 @@ function renderMessageEl(m) {
   return el;
 }
 
-async function sendText() {
+function sendText() {
   const input = $('msg-input'); const text = input.value.trim();
   if (!text) return;
-  await db.messages.add({id:uid(),role:'user',type:'text',content:text,ts:Date.now()});
-  input.value=''; await renderMessages();
+  db.messages.push({id:uid(),role:'user',type:'text',content:text,ts:Date.now()});
+  saveDB();
+  input.value=''; renderMessages();
 }
 
 async function onSpeak() {
   if (Math.random()*100 < settings.noReplyChance) return;
-  const cards = await db.cards.toArray();
+  const cards = db.cards;
   if (!cards.length) { alert('字卡库为空，请先到「字卡」页添加'); return; }
   const n = randInt(settings.minCount, settings.maxCount);
   const picked = pickN(cards, n);
@@ -208,14 +228,15 @@ async function onSpeak() {
       segs = [...segs, ...extra.map(e=>e.content)];
     }
     const content = joinSegments(segs, settings.separators);
-    await db.messages.add({id:uid(),role:'other',type:'text',content,ts:Date.now()});
-    await renderMessages();
+    db.messages.push({id:uid(),role:'other',type:'text',content,ts:Date.now()});
+    saveDB();
+    renderMessages();
   }
   typing.style.display='none';
 }
 
-async function renderCards() {
-  const cards = await db.cards.toArray();
+function renderCards() {
+  const cards = db.cards;
   const c = $('cards-list'); c.innerHTML='';
   if (!cards.length) { c.innerHTML='<div style="text-align:center;color:var(--text-secondary);padding:40px 0;font-size:14px">还没有字卡，在下面添加</div>'; return; }
   const g = document.createElement('div'); g.className='card-group';
@@ -228,52 +249,58 @@ async function renderCards() {
   c.appendChild(g);
 }
 function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-async function addCard() {
+function addCard() {
   const input = $('new-card'); const text = input.value.trim();
   if (!text) return;
-  await db.cards.add({id:uid(),content:text,weight:1,enabled:true});
-  input.value=''; await renderCards();
+  db.cards.push({id:uid(),content:text,weight:1,enabled:true});
+  saveDB();
+  input.value=''; renderCards();
 }
-async function deleteCard(id) { if(!confirm('删除这张字卡？'))return; await db.cards.delete(id); await renderCards(); }
-async function editWeight(id) {
-  const card = await db.cards.get(id);
+function deleteCard(id) { if(!confirm('删除这张字卡？'))return; db.cards = db.cards.filter(x=>x.id!==id); saveDB(); renderCards(); }
+function editWeight(id) {
+  const card = db.cards.find(x=>x.id===id);
   const w = prompt('权重 1-10', String(card.weight||1));
   if (w===null) return;
-  await db.cards.update(id,{weight:Math.min(10,Math.max(1,parseInt(w)||1))});
-  await renderCards();
+  card.weight = Math.min(10,Math.max(1,parseInt(w)||1));
+  saveDB(); renderCards();
 }
 
-async function exportData() {
-  const data = { settings:await db.settings.toArray(), cards:await db.cards.toArray(), messages:await db.messages.toArray(), exportedAt:Date.now() };
+function exportData() {
+  const data = { settings: db.settings, cards: db.cards, messages: db.messages, exportedAt:Date.now() };
   const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'companion-backup-'+new Date().toISOString().slice(0,10)+'.json';
   a.click();
 }
-async function importData(e) {
+function importData(e) {
   const file = e.target.files[0]; if (!file) return;
   if (!confirm('导入将覆盖当前所有数据，确定？')) return;
-  const data = JSON.parse(await file.text());
-  await db.transaction('rw', db.settings, db.cards, db.messages, async () => {
-    await db.settings.clear(); await db.cards.clear(); await db.messages.clear();
-    if (data.settings) await db.settings.bulkAdd(data.settings);
-    if (data.cards) await db.cards.bulkAdd(data.cards);
-    if (data.messages) await db.messages.bulkAdd(data.messages);
-  });
-  alert('导入完成，即将刷新'); location.reload();
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    try {
+      const data = JSON.parse(evt.target.result);
+      if(data.settings) db.settings = data.settings;
+      if(data.cards) db.cards = data.cards;
+      if(data.messages) db.messages = data.messages;
+      saveDB();
+      alert('导入完成，即将刷新'); location.reload();
+    } catch(err) { alert('导入失败，文件格式错误'); }
+  };
+  reader.readAsText(file);
 }
-async function resetData() {
+function resetData() {
   if (!confirm('重置将清空所有数据，确定？')) return;
-  await db.settings.clear(); await db.cards.clear(); await db.messages.clear();
+  db.settings = []; db.cards = []; db.messages = [];
+  saveDB();
   alert('已重置，即将刷新'); location.reload();
 }
 
-(async () => {
-  await loadSettings();
-  await renderMessages();
-  await renderCards();
-})();
+// 初始化
+loadDB();
+loadSettings();
+renderMessages();
+renderCards();
 </script>
 </body>
 </html>
